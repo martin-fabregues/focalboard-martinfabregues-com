@@ -13,10 +13,10 @@ services:
       # Base de datos SQLite (simple)
       FB_DB_TYPE: sqlite3
       FB_DB_CONFIG: /opt/focalboard/focalboard.db
-      
+
       # Configuración opcional
-      FB_SINGLE_USER: false
-      FB_ENABLE_SUBSCRIPTIONS: true
+      FB_SINGLE_USER: "false"
+      FB_ENABLE_SUBSCRIPTIONS: "true"
       
     volumes:
       - focalboard_data:/opt/focalboard
