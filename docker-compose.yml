@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  focalboard:
+    image: mattermost/focalboard:latest
+    environment:
+      # Configuración básica
+      FB_SERVER_ROOT: ${DOMAIN_NAME}
+      FB_PORT: 8000
+      FB_WEB_PATH: ./pack
+      FB_FILES_PATH: ./files
+      
+      # Base de datos SQLite (simple)
+      FB_DB_TYPE: sqlite3
+      FB_DB_CONFIG: /opt/focalboard/focalboard.db
+      
+      # Configuración opcional
+      FB_SINGLE_USER: false
+      FB_ENABLE_SUBSCRIPTIONS: true
+      
+    volumes:
+      - focalboard_data:/opt/focalboard
+    networks:
+      - traefik
+    deploy:
+      replicas: 1
+      placement:
+        constraints: ["${NODE}"]
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.${SERVICE_NAME}.entrypoints=web"
+        - "traefik.http.routers.${SERVICE_NAME}.rule=Host(`${DOMAIN_NAME}`)"
+        - "traefik.http.services.${SERVICE_NAME}.loadbalancer.server.port=8000"        
+    logging:
+      driver: loki
+      options:
+        loki-url: ${LOKI_URL}
+
+volumes:
+  focalboard_data:
+    name: "${SERVICE_NAME}_focalboard_data"
+
+networks:
+  traefik:
+    external: true
+    name: traefik
